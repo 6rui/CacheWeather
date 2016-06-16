@@ -1,11 +1,14 @@
-package com.demo.liur.cacheweather.model;
+package com.demo.liur.cacheweather.data;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.demo.liur.cacheweather.data.CacheOpenHelper;
+import com.demo.liur.cacheweather.model.Area;
+import com.demo.liur.cacheweather.model.City;
+import com.demo.liur.cacheweather.model.County;
+import com.demo.liur.cacheweather.model.Province;
 
 import java.util.ArrayList;
 
@@ -38,6 +41,7 @@ public class CacheWeatherDB {
         }
         return mCacheWeatherDB;
     }
+
 
     /**
      * 将实例对象存储在数据库中
@@ -128,4 +132,44 @@ public class CacheWeatherDB {
         }
         return counties;
     }
+
+    /***********************************************************************************************
+     * 优化后代码
+     */
+    public ArrayList<Area> loadArea(Area area) {
+        ArrayList<Area> areas = new ArrayList<>();
+        String tableName = getAreaClassString(area);
+        Cursor cursor = mDB.query(tableName, null, null, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                area.setId(cursor.getInt(cursor.getColumnIndex("id")));
+                area.setName(cursor.getString(cursor.getColumnIndex("name")));
+                area.setCode(cursor.getString(cursor.getColumnIndex("code")));
+                areas.add(area);
+            } while (cursor.moveToNext());
+        }
+        return areas;
+    }
+
+    public void savaArea(Area area) {
+        if (area != null) {
+            ContentValues values = new ContentValues();
+            String tableName = getAreaClassString(area);
+            values.put("name", area.getName());
+            values.put("code", area.getCode());
+            mDB.insert(tableName, null, values);
+        }
+    }
+    private String getAreaClassString(Area area) {
+        String tableName;
+        if (area instanceof Province) {
+            tableName = "Province";
+        } else if (area instanceof City) {
+            tableName = "City";
+        } else {
+            tableName = "County";
+        }
+        return tableName;
+    }
+
 }

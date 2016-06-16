@@ -4,7 +4,7 @@ package com.demo.liur.cacheweather.model;
  * 实体类：县
  * Created by Liur on 2016/6/15.
  */
-public class County {
+public class County extends Area{
     private int id;
     private String countyCode;
     private String countyName;
